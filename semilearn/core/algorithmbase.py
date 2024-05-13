@@ -96,7 +96,7 @@ class AlgorithmBase:
         self.ema = None
 
         # build dataset
-        self.dataset_dict = self.set_dataset()
+        self.dataset_dict, self.n_pool = self.set_dataset(get_size=True)
 
         # build data loader
         self.loader_dict = self.set_data_loader()
@@ -115,10 +115,18 @@ class AlgorithmBase:
         # other arguments specific to the algorithm
         # self.init(**kwargs)
 
+        # AL arguments
+        self.al = None
+        self.num_query_epochs = args.num_query_epochs
+        self.label_epochs = args.label_epochs
+
         # set common hooks during training
         self._hooks = []  # record underlying hooks
         self.hooks_dict = OrderedDict()  # actual object to be used to call hooks
         self.set_hooks()
+
+    def set_active_learner(self, al):
+        self.al = al
 
     def init(self, **kwargs):
         """
@@ -126,7 +134,7 @@ class AlgorithmBase:
         """
         raise NotImplementedError
 
-    def set_dataset(self):
+    def set_dataset(self, idxs_lb_mask=None, get_size=False):
         """
         set dataset_dict
         """
@@ -140,6 +148,7 @@ class AlgorithmBase:
             self.args.num_classes,
             self.args.data_dir,
             self.args.include_lb_to_ulb,
+            idxs_lb_mask
         )
         if dataset_dict is None:
             return dataset_dict
@@ -157,7 +166,42 @@ class AlgorithmBase:
         )
         if self.rank == 0 and self.distributed:
             torch.distributed.barrier()
-        return dataset_dict
+        if get_size:
+            size = self.args.ulb_dest_len if self.args.include_lb_to_ulb else self.args.ulb_dest_len + self.args.lb_dest_len
+            return dataset_dict, size
+        else:
+            return dataset_dict
+
+    def get_data_loader_for_al(self):
+        """ Only used to extract information from NN """
+        if self.dataset_dict is None:
+            return
+        temp_lb_transform = self.dataset_dict["train_lb"].transform
+        temp_ulb_transform = self.dataset_dict["train_ulb"].transform
+        self.dataset_dict["train_lb"].transform = None
+        self.dataset_dict["train_ulb"].transform = None
+        loader_dict = {}
+        loader_dict["sequential_lb_loader"] = get_data_loader(
+            self.args,
+            self.dataset_dict["train_lb"],
+            self.args.batch_size,
+            data_sampler=None,  # = SequentialSampler
+            num_workers=self.args.num_workers,
+            drop_last=False,
+        )
+
+        loader_dict["sequential_ulb_loader"] = get_data_loader(
+            self.args,
+            self.dataset_dict["train_ulb"],
+            self.args.batch_size,
+            data_sampler=None,  # = SequentialSampler
+            num_workers=self.args.num_workers,
+            drop_last=False,
+        )
+        self.dataset_dict["train_lb"].transform = temp_lb_transform
+        self.dataset_dict["train_ulb"].transform = temp_ulb_transform
+        self.print_fn(f"[!] al data loader keys: {loader_dict.keys()}")
+        return loader_dict
 
     def set_data_loader(self):
         """
@@ -332,6 +376,66 @@ class AlgorithmBase:
         # return log_dict
         raise NotImplementedError
 
+    def train_active(self):
+        """
+        train function with al_algorithms labeling
+        """
+        self.model.train()
+        self.call_hook("before_run")
+
+        idxs_lb_mask = np.zeros(self.n_pool, dtype=bool)
+        idxs_tmp = np.arange(self.n_pool)
+        np.random.shuffle(idxs_tmp)
+        idxs_lb_mask[idxs_tmp[:self.num_query_epochs[0]]] = True
+        self.dataset_dict = self.set_dataset(idxs_lb_mask)
+        self.al.update(idxs_lb_mask)
+        # Sequential loaders --> idxs are not changed
+        # be careful when updating idxs_lb_mask, always has to be mapped back
+        al_data_loaders = self.get_data_loader_for_al()
+
+        # reset normal data loaders for semi-supervised training with original training routine
+        self.loader_dict = self.set_data_loader()
+        qs_counter = 1
+        for epoch in range(self.start_epoch, self.epochs):
+            self.epoch = epoch
+
+            # prevent the training iterations exceed args.num_train_iter
+            if self.it >= self.num_train_iter:
+                break
+            print(f"Epoch: {epoch} Iter: {self.it} (Query at {self.label_epochs})")
+            if epoch > 0 and epoch in self.label_epochs:
+                query_idxs = self.al.query(
+                    n=self.num_query_epochs[qs_counter],
+                    clf=self.model,
+                    data_loaders=al_data_loaders
+                )
+                qs_counter += 1
+                idxs_lb_mask[query_idxs] = True
+                self.dataset_dict = self.set_dataset(idxs_lb_mask)
+                self.al.update(idxs_lb_mask)
+                al_data_loaders = self.get_data_loader_for_al()
+                self.loader_dict = self.set_data_loader()
+
+            self.call_hook("before_train_epoch")
+
+            for data_lb, data_ulb in zip(
+                self.loader_dict["train_lb"], self.loader_dict["train_ulb"]
+            ):
+                # prevent the training iterations exceed args.num_train_iter
+                if self.it >= self.num_train_iter:
+                    break
+
+                self.call_hook("before_train_step")
+                self.out_dict, self.log_dict = self.train_step(
+                    **self.process_batch(**data_lb, **data_ulb)
+                )
+                self.call_hook("after_train_step")
+                self.it += 1
+            print(f"... Made it through the loader...")
+            self.call_hook("after_train_epoch")
+
+        self.call_hook("after_run")
+
     def train(self):
         """
         train function
@@ -365,6 +469,10 @@ class AlgorithmBase:
             self.call_hook("after_train_epoch")
 
         self.call_hook("after_run")
+
+    # def extract(self, loader_lb, loader_ulb):
+    #     self.model.eval()
+    #     with torch.no_grad():
 
     def evaluate(self, eval_dest="eval", out_key="logits", return_logits=False):
         """

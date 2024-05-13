@@ -82,7 +82,9 @@ def get_svhn(args, alg, name, num_labels, num_classes, data_dir='./data', includ
                                                                 ulb_num_labels=args.ulb_num_labels,
                                                                 lb_imbalance_ratio=args.lb_imb_ratio,
                                                                 ulb_imbalance_ratio=args.ulb_imb_ratio,
-                                                                include_lb_to_ulb=include_lb_to_ulb)
+                                                                include_lb_to_ulb=include_lb_to_ulb,
+                                                                lb_index=lb_index, ulb_index=ulb_index
+                                                                )
     if alg == 'fullysupervised':
         lb_data = data
         lb_targets = targets

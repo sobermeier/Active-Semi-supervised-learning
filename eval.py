@@ -51,7 +51,7 @@ if __name__ == "__main__":
     args.save_name = ''
     
     net = get_net_builder(args.net, args.net_from_name)(num_classes=args.num_classes)
-    keys = net.load_state_dict(load_state_dict)
+    keys = net.load_state_dict(load_state_dict, strict=False)
     if torch.cuda.is_available():
         net.cuda()
     net.eval()

@@ -79,7 +79,7 @@ class BasicDataset(Dataset):
         img, target = self.__sample__(idx)
 
         if self.transform is None:
-            return  {'x_lb':  transforms.ToTensor()(img), 'y_lb': target}
+            return {'x_lb':  transforms.ToTensor()(img), 'y_lb': target}
         else:
             if isinstance(img, np.ndarray):
                 img = Image.fromarray(img)

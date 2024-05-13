@@ -844,7 +844,7 @@ def balanced_selection(total_data, total_targets, num_classes, per_class_data):
     return selected_data, selected_targets, unselected_data, unselected_targets
 
 
-def get_medmnist(args, alg, dataset_name, num_labels, num_classes, data_dir='./data', include_lb_to_ulb=True):
+def get_medmnist(args, alg, dataset_name, num_labels, num_classes, data_dir='./data', include_lb_to_ulb=True,  lb_index=None, ulb_index=None):
     data_dir = os.path.join(data_dir, 'medmnist', dataset_name.lower())
 
     name2class = {
@@ -917,7 +917,10 @@ def get_medmnist(args, alg, dataset_name, num_labels, num_classes, data_dir='./d
                                                                                                               ulb_num_labels=args.ulb_num_labels,
                                                                                                               lb_imbalance_ratio=args.lb_imb_ratio,
                                                                                                               ulb_imbalance_ratio=args.ulb_imb_ratio,
-                                                                                                              include_lb_to_ulb=include_lb_to_ulb)
+                                                                                                              include_lb_to_ulb=include_lb_to_ulb,
+                                                                                                              lb_index=lb_index,
+                                                                                                              ulb_index=ulb_index
+                                                                                                              )
                                                                                                               
     if alg == 'fullysupervised':
         if len(train_unlabeled_data) == len(total_data):
