@@ -25,8 +25,8 @@ class MeanTeacher(AlgorithmBase):
         - unsup_warm_up (`float`, *optional*, defaults to 0.4):
             Ramp up for weights for unsupervised loss
     """
-    def __init__(self, args, net_builder, tb_log=None, logger=None, **kwargs):
-        super().__init__(args, net_builder, tb_log, logger, **kwargs)
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None, **kwargs):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger, **kwargs)
         # mean teacher specified arguments
         self.init(unsup_warm_up=args.unsup_warm_up)
     

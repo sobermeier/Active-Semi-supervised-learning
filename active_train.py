@@ -13,6 +13,8 @@ import torch.backends.cudnn as cudnn
 import torch.distributed as dist
 import torch.multiprocessing as mp
 import torch.nn.parallel
+
+import mlflow_logger
 from semilearn.algorithms import get_algorithm, name2alg
 from semilearn.al_algorithms import get_al_algorithm
 from semilearn.core.utils import (
@@ -316,17 +318,19 @@ def main(args):
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()  # number of gpus of each node
 
+    flow_logger = mlflow_logger.MLFlowLogger(experiment_name="SALOON_Test2")
+    tracking_uri = flow_logger.get_tracking_uri()
     if args.multiprocessing_distributed:
         # now, args.world_size means num of total processes in all nodes
         args.world_size = ngpus_per_node * args.world_size
 
         # args=(,) means the arguments of main_worker
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args, flow_logger, tracking_uri))
     else:
-        main_worker(args.gpu, ngpus_per_node, args)
+        main_worker(args.gpu, ngpus_per_node, args, flow_logger = flow_logger, tracking_uri = tracking_uri)
+    flow_logger.finalise_experiment()
 
-
-def main_worker(gpu, ngpus_per_node, args):
+def main_worker(gpu, ngpus_per_node, args, flow_logger, tracking_uri):
     """
     main_worker is conducted on each GPU.
     """
@@ -358,6 +362,9 @@ def main_worker(gpu, ngpus_per_node, args):
             world_size=args.world_size,
             rank=args.rank,
         )
+    print("args", args)
+
+
 
     # SET save_path and logger
     save_path = os.path.join(args.save_dir, args.save_name)
@@ -376,10 +383,15 @@ def main_worker(gpu, ngpus_per_node, args):
     if args.imb_algorithm is not None:
         model = get_imb_algorithm(args, _net_builder, tb_log, logger)
     else:
-        model = get_algorithm(args, _net_builder, tb_log, logger)
+        model = get_algorithm(args, _net_builder, tb_log, logger, flow_logger)
 
     active_learner = get_al_algorithm(args)
     logger.info(f"Number of Trainable Params: {count_parameters(model.model)}")
+
+    cfg_dict = args
+    run_name = str(args.save_name)
+    print(save_path)
+    run_id, output_path = flow_logger.init_experiment(run_name, hyper_parameters=cfg_dict, log_file=save_path, tracking_uri=tracking_uri)
 
     # SET Devices for (Distributed) DataParallel
     model.model = send_model_cuda(args, model.model)

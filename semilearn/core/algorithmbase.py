@@ -57,7 +57,7 @@ class AlgorithmBase:
             logger to use
     """
 
-    def __init__(self, args, net_builder, tb_log=None, logger=None, **kwargs):
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None, **kwargs):
         # common arguments
         self.args = args
         self.num_classes = args.num_classes
@@ -124,6 +124,8 @@ class AlgorithmBase:
         self._hooks = []  # record underlying hooks
         self.hooks_dict = OrderedDict()  # actual object to be used to call hooks
         self.set_hooks()
+
+        self.flow_logger = flow_logger
 
     def set_active_learner(self, al):
         self.al = al

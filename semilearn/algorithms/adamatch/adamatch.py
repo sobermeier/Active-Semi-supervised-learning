@@ -34,8 +34,8 @@ class AdaMatch(AlgorithmBase):
             - ema_p (`float`):
                 momentum for average probability
     """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger) 
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         self.init(p_cutoff=args.p_cutoff, T=args.T, hard_label=args.hard_label, ema_p=args.ema_p)
     
     def init(self, p_cutoff, T, hard_label=True, ema_p=0.999):

@@ -31,8 +31,8 @@ class SoftMatch(AlgorithmBase):
             - ema_p (`float`):
                 exponential moving average of probability update
         """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger) 
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         self.init(T=args.T, hard_label=args.hard_label, dist_align=args.dist_align, dist_uniform=args.dist_uniform, ema_p=args.ema_p, n_sigma=args.n_sigma, per_class=args.per_class)
     
     def init(self, T, hard_label=True, dist_align=True, dist_uniform=True, ema_p=0.999, n_sigma=2, per_class=False):

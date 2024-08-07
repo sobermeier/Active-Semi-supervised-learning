@@ -46,8 +46,8 @@ def entropy_loss(mask, logits_s, prob_model, label_hist):
 
 @ALGORITHMS.register('freematch')
 class FreeMatch(AlgorithmBase):
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger) 
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         self.init(T=args.T, hard_label=args.hard_label, ema_p=args.ema_p, use_quantile=args.use_quantile, clip_thresh=args.clip_thresh)
         self.lambda_e = args.ent_loss_ratio
 

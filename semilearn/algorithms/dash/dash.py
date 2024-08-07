@@ -40,8 +40,8 @@ class Dash(AlgorithmBase):
             - num_wu_eval_iter (`int`, *optional*, default=100):
                 Number of steps between two evaluations for the warmup phase
         """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger) 
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         # dash specified arguments
         self.init(T=args.T, num_wu_iter=args.num_wu_iter, num_wu_eval_iter=args.num_wu_eval_iter)
     

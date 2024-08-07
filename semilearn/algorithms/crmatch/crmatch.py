@@ -135,10 +135,10 @@ class CRMatch(AlgorithmBase):
             - hard_label (`bool`, *optional*, default to `False`):
                 If True, targets have [Batch size] shape with int values. If False, the target is vector
         """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
         self.lambda_rot = args.rot_loss_ratio
         self.use_rot = self.lambda_rot > 0
-        super().__init__(args, net_builder,  tb_log, logger)
+        super().__init__(args, net_builder,  tb_log, logger, flow_logger)
         # crmatch specified arguments
         self.init(p_cutoff=args.p_cutoff, hard_label=args.hard_label)
         

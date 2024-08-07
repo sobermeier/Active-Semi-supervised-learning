@@ -28,8 +28,8 @@ class PseudoLabel(AlgorithmBase):
             Ramp up for weights for unsupervised loss
     """
 
-    def __init__(self, args, net_builder, tb_log=None, logger=None, **kwargs):
-        super().__init__(args, net_builder, tb_log, logger, **kwargs)
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None, **kwargs):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger, **kwargs)
         self.init(p_cutoff=args.p_cutoff, unsup_warm_up=args.unsup_warm_up)
 
     def init(self, p_cutoff, unsup_warm_up=0.4):

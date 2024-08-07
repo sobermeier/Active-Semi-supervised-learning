@@ -68,8 +68,8 @@ class SimMatch(AlgorithmBase):
         - in_loss_ratio (`float`, *optional*, default to 1.0):
             Loss weight for simmatch feature loss
     """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger) 
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         # simmatch specified arguments
         # adjust k 
         self.use_ema_teacher = True

@@ -32,8 +32,8 @@ class UDA(AlgorithmBase):
         - tsa_schedule ('str'):
             TSA schedule to use
     """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger)
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         # uda specified arguments
         self.init(T=args.T, p_cutoff=args.p_cutoff, tsa_schedule=args.tsa_schedule)
 

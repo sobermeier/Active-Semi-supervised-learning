@@ -32,8 +32,8 @@ class MixMatch(AlgorithmBase):
             - mixup_manifold (`bool`, *optional*, defaults to `False`):
                 Whether or not to use manifold mixup
     """
-    def __init__(self, args, net_builder, tb_log=None, logger=None):
-        super().__init__(args, net_builder, tb_log, logger)
+    def __init__(self, args, net_builder, tb_log=None, logger=None, flow_logger=None):
+        super().__init__(args, net_builder, tb_log, logger, flow_logger)
         # mixmatch specified arguments
         self.init(T=args.T, unsup_warm_up=args.unsup_warm_up, mixup_alpha=args.mixup_alpha, mixup_manifold=args.mixup_manifold)
 
