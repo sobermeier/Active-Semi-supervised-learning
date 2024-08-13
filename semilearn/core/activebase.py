@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 
 class ActiveBase:
@@ -6,6 +7,7 @@ class ActiveBase:
         self.idxs_lb = None
         self.n_pool = None
         self.gpu = gpu
+        print("AL started", flush=True)
 
     def query(self, n, clf, data_loaders):
         pass
@@ -27,8 +29,10 @@ class ActiveBase:
         all_probs = []
         with torch.no_grad():
             for data in data_loader:
-                x = data["x_lb"]
-                y = data["y_lb"]
+
+                #print("data", data)
+                x = data["x_lb_al"]
+                y = data["y_lb_al"]
 
                 if isinstance(x, dict):
                     x = {k: v.cuda(self.gpu) for k, v in x.items()}

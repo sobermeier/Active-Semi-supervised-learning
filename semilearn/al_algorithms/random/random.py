@@ -10,6 +10,7 @@ from semilearn.core.activebase import ActiveBase
 class Random(ActiveBase):
     def __init__(self, gpu):
         super().__init__(gpu)
+        print("Random started", flush=True)
 
     def query(self, n, clf, data_loaders):
         idxs_unlabeled = np.arange(len(self.idxs_lb))[~self.idxs_lb]

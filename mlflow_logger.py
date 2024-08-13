@@ -36,8 +36,8 @@ class MLFlowLogger:
 			self,
 			root: str = DATA_ROOT + '/experiments',
 			tracking_uri: str = 'http://usedom.dbs.ifi.lmu.de:5002/',
-			experiment_name: str = 'SALOON_Test',
-			artifact_location="/nfs/data8/jahnp/saloon/artifacts",
+			experiment_name: str = 'SALOON_Test2',
+			artifact_location="/nfs/data3/jahnp/saloon/artifacts",
 	):
 		"""
         Constructor.
@@ -124,6 +124,11 @@ class MLFlowLogger:
         :return: None.
         """
 		mlflow.log_metrics(metrics=flatten_dict(result), step=step)
+
+	@staticmethod
+	def log_querydict(querydict, step=None):
+		querycsv = querydict.to_csv(None, index=False)
+		mlflow.log_text(querycsv, f"query_{step}.csv")
 
 
 	def log_log_file(self):

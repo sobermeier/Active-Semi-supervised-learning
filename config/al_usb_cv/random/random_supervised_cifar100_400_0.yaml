@@ -1,5 +1,5 @@
 algorithm: supervised
-al: random
+al_algorithm: random
 save_dir: ./saved_models/al_algorithms/
 save_name: random_supervised_cifar100_400_0
 resume: True

@@ -92,11 +92,13 @@ class FullySupervised(AlgorithmBase):
                 break
             print(f"Epoch: {epoch} Iter: {self.it} (Query at {self.label_epochs})")
             if epoch > 0 and epoch in self.label_epochs:
-                query_idxs = self.al.query(
+                print("al_data_loaders", al_data_loaders.keys(), al_data_loaders)
+                query_idxs, query_dict = self.al.query(
                     n=self.num_query_epochs[qs_counter],
                     clf=self.model,
                     data_loaders=al_data_loaders
                 )
+                self.flow_logger.log_querydict(query_dict, epoch)
                 qs_counter += 1
                 idxs_lb_mask[query_idxs] = True
                 self.dataset_dict = self.set_dataset(idxs_lb_mask)

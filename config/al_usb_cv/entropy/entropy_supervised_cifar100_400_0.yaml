@@ -1,5 +1,5 @@
 algorithm: supervised
-al: entropy
+al_algorithm: entropy
 save_dir: ./saved_models/al_algorithms/
 save_name: entropy_supervised_cifar100_400_0
 resume: True
