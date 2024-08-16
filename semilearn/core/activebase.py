@@ -31,8 +31,13 @@ class ActiveBase:
             for data in data_loader:
 
                 #print("data", data)
-                x = data["x_lb_al"]
-                y = data["y_lb_al"]
+
+                if "x_lb" in data.keys():
+                    x = data["x_lb"]
+                    y = data["y_lb"]
+                else:
+                    x = data["x_lb_al"]
+                    y = data["y_lb_al"]
 
                 if isinstance(x, dict):
                     x = {k: v.cuda(self.gpu) for k, v in x.items()}

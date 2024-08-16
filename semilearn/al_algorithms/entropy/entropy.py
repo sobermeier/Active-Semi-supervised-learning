@@ -17,13 +17,13 @@ class Entropy(ActiveBase):
     def query(self, n, clf, data_loaders):
         idxs_unlabeled = np.arange(len(self.idxs_lb))[~self.idxs_lb]
         x, y, embs, logits, probs, preds = self.get_x_y_embs_logits_probs_preds(clf, data_loaders["sequential_ulb_loader"])
-        if len(x) != len(idxs_unlabeled):
-            x = x[idxs_unlabeled]
-            y = y[idxs_unlabeled]
-            embs = embs[idxs_unlabeled]
-            logits = logits[idxs_unlabeled]
-            probs = probs[idxs_unlabeled]
-            preds = preds[idxs_unlabeled]
+        diff = len(y) - len(idxs_unlabeled)
+        x = x[diff:]
+        y = y[diff:]
+        embs = embs[diff:]
+        logits = logits[diff:]
+        probs = probs[diff:]
+        preds = preds[diff:]
         probs += 1e-8
         entropy = - (torch.tensor(probs) * torch.log(torch.tensor(probs))).sum(1)
         entropy_sorted, idx_sorted = entropy.sort(descending=True)
@@ -35,6 +35,6 @@ class Entropy(ActiveBase):
         correct = preds == y
 
         query_df = pd.DataFrame(
-            [list(idxs_unlabeled), list(chosen_all), y, preds, correct, entropy.cpu().numpy()],
-            index=["id", "chosen", "label", "pred", "correct", "entropy"]).T
+            [list(idxs_unlabeled), list(chosen_all), y, preds, correct, entropy.cpu().numpy(), query_idx],
+            index=["id", "chosen", "label", "pred", "correct", "entropy", "query_idx"]).T
         return query_idx, query_df
