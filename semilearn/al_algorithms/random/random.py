@@ -36,5 +36,5 @@ class Random(ActiveBase):
 
         query_df = pd.DataFrame(
             [list(idxs_full), list(chosen_all), y, preds, correct, query_idx],
-            index=["id", "labelled", "chosen", "label", "pred", "correct", "query_idx"]).T
+            index=["id", "chosen", "label", "pred", "correct", "query_idx"]).T
         return query_idx, query_df
