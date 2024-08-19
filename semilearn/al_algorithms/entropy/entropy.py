@@ -10,8 +10,8 @@ from semilearn.core.activebase import ActiveBase
 
 @AL_ALGORITHMS.register('entropy')
 class Entropy(ActiveBase):
-    def __init__(self, gpu):
-        super().__init__(gpu)
+    def __init__(self, args, gpu):
+        super().__init__(args, gpu)
         print("Entropy started", flush=True)
 
     def query(self, n, clf, data_loaders):

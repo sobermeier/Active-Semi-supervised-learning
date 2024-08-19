@@ -10,6 +10,7 @@ def get_al_algorithm(args):
     print("**************")
     if args.al_algorithm in AL_ALGORITHMS:
         al_alg = AL_ALGORITHMS[args.al_algorithm]( # name2alg[args.algorithm](
+            args=args,
             gpu=args.gpu,
         )
         return al_alg

@@ -3,7 +3,8 @@ import numpy as np
 
 
 class ActiveBase:
-    def __init__(self, gpu):
+    def __init__(self, args, gpu):
+        self.args = args
         self.idxs_lb = None
         self.n_pool = None
         self.gpu = gpu

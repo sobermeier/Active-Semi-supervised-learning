@@ -10,12 +10,12 @@ from semilearn.core.activebase import ActiveBase
 from sklearn.cluster import KMeans
 
 
-# original code from https://github.com/ej0cl6/deep-active-learning/blob/master/query_strategies/kmeans_sampling.py
+# This implementation originated from https://github.com/ej0cl6/deep-active-learning/blob/master/query_strategies/kmeans_sampling.py
 @AL_ALGORITHMS.register('kmeans')
 class KMeansAL(ActiveBase):
-    def __init__(self, gpu):
+    def __init__(self, args, gpu):
         print("kMeans initialized")
-        super().__init__(gpu)
+        super().__init__(args, gpu)
 
     def query(self, n, clf, data_loaders):
         idxs_unlabeled = np.arange(len(self.idxs_lb))[~self.idxs_lb]

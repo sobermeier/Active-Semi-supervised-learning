@@ -10,9 +10,9 @@ from semilearn.core.activebase import ActiveBase
 
 @AL_ALGORITHMS.register('margin')
 class Margin(ActiveBase):
-    def __init__(self, gpu):
+    def __init__(self, args, gpu):
         print("Margin initialized")
-        super().__init__(gpu)
+        super().__init__(args, gpu)
 
     def query(self, n, clf, data_loaders):
         idxs_unlabeled = np.arange(len(self.idxs_lb))[~self.idxs_lb]

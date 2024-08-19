@@ -9,8 +9,8 @@ from semilearn.core.activebase import ActiveBase
 
 @AL_ALGORITHMS.register('random')
 class Random(ActiveBase):
-    def __init__(self, gpu):
-        super().__init__(gpu)
+    def __init__(self, args, gpu):
+        super().__init__(args, gpu)
         print("Random started", flush=True)
 
     def query(self, n, clf, data_loaders):
@@ -26,7 +26,7 @@ class Random(ActiveBase):
         preds = preds[diff:]
 
 
-        chosen = np.random.randint(len(idxs_unlabeled),size=n)
+        chosen = np.random.choice(range(len(idxs_unlabeled)),n,replace=False)
         query_idx = idxs_unlabeled[chosen]
 
         chosen_all = np.zeros(len(idxs_unlabeled), dtype=bool)
@@ -35,6 +35,6 @@ class Random(ActiveBase):
         correct = preds == y
 
         query_df = pd.DataFrame(
-            [list(idxs_full), list(chosen_all), y, preds, correct, query_idx],
+            [list(idxs_unlabeled), list(chosen_all), y, preds, correct, query_idx],
             index=["id", "chosen", "label", "pred", "correct", "query_idx"]).T
         return query_idx, query_df
