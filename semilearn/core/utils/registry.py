@@ -70,7 +70,7 @@ ALL_MODULES = [
     ('semilearn.algorithms', ['adamatch', 'comatch', 'crmatch', 'dash', 'fixmatch', 'flexmatch', 'fullysupervised', 'meanteacher',
                               'mixmatch', 'pimodel', 'pseudolabel', 'remixmatch', 'simmatch', 'uda', 'vat', 'softmatch', 'freematch', 'defixmatch']),
     ('semilearn.imb_algorithms', ['abc', 'cossl', 'adsh', 'crest', 'darp', 'daso', 'debiaspl', 'saw', 'tras']),
-    ('semilearn.al_algorithms', ['random', 'entropy', 'margin', 'leastconfidence', 'kcenter', 'kmeans', 'badge', 'coreset', 'powermargin', 'falcun'])
+    ('semilearn.al_algorithms', ['random', 'entropy', 'margin', 'leastconfidence', 'kcenter', 'kmeans', 'badge', 'coreset', 'powermargin', 'falcun', 'cdal', 'alphamix'])
 ]
 
 

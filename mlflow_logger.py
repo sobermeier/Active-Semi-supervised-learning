@@ -5,8 +5,6 @@ from typing import Dict, Any, Tuple, Sequence
 import mlflow
 import pandas as pd
 
-from settings import DATA_ROOT
-
 # originial mlflow logger code by Sandra Gilhuber
 
 def flatten_dict(d):
@@ -34,7 +32,7 @@ def flatten_dict(d):
 class MLFlowLogger:
 	def __init__(
 			self,
-			root: str = DATA_ROOT + '/experiments',
+			root: str = '/nfs/data3/jahnp/saloon/experiments',
 			tracking_uri: str = 'http://usedom.dbs.ifi.lmu.de:5002/',
 			experiment_name: str = 'SALOON_Test2',
 			artifact_location="/nfs/data3/jahnp/saloon/artifacts",
