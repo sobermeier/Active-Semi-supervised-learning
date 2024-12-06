@@ -16,9 +16,9 @@ from semilearn.datasets.augmentation import RandAugment
 mean, std = {}, {}
 mean['stl10'] = [x / 255 for x in [112.4, 109.1, 98.6]]
 std['stl10'] = [x / 255 for x in [68.4, 66.6, 68.5]]
-img_size = 96
 
 def get_transform(mean, std, crop_size, train=True, crop_ratio=0.95):
+    img_size = 96
     img_size = int(img_size / crop_ratio)
 
     if train:

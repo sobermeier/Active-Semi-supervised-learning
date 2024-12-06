@@ -32,7 +32,7 @@ def get_transform(mean, std, crop_size, train=True, crop_ratio=0.95):
                                    transforms.Normalize(mean, std)])
 
 
-def get_svhn(args, alg, name, num_labels, num_classes, data_dir='./data', include_lb_to_ulb=True):
+def get_svhn(args, alg, name, num_labels, num_classes, data_dir='./data', include_lb_to_ulb=True, lb_index=None, ulb_index=None):
 
     crop_size = args.img_size
     crop_ratio = args.crop_ratio

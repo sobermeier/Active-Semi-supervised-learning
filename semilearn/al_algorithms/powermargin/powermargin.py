@@ -7,6 +7,7 @@ import torch
 from semilearn.core.utils import AL_ALGORITHMS
 from semilearn.core.activebase import ActiveBase
 
+# This implementation was based on https://github.com/ValentinMargraf/ActiveLearningPipelines/tree/main
 
 @AL_ALGORITHMS.register('powermargin')
 class PowerMargin(ActiveBase):
