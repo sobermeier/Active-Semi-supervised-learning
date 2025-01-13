@@ -27,23 +27,26 @@ class FullySupervised(AlgorithmBase):
 
     def train_step(self, x_lb, y_lb):
         # inference and calculate sup/unsup losses
-        with self.amp_cm():
 
+        #print("x_lb", x_lb.shape, flush=True)
+        with self.amp_cm():
             logits_x_lb = self.model(x_lb)['logits']
+            #print("logits_x_lb", logits_x_lb.shape, flush=True)
+
             sup_loss = self.ce_loss(logits_x_lb, y_lb, reduction='mean')
 
         out_dict = self.process_out_dict(loss=sup_loss)
         log_dict = self.process_log_dict(sup_loss=sup_loss.item())
         return out_dict, log_dict
-    
+
     def train(self):
         # lb: labeled, ulb: unlabeled
         self.model.train()
         self.call_hook("before_run")
-            
+
         for epoch in range(self.start_epoch, self.epochs):
             self.epoch = epoch
-            
+
             # prevent the training iterations exceed args.num_train_iter
             if self.it > self.num_train_iter:
                 break
@@ -75,15 +78,16 @@ class FullySupervised(AlgorithmBase):
         idxs_tmp = np.arange(self.n_pool)
         np.random.shuffle(idxs_tmp)
         idxs_lb_mask[idxs_tmp[:self.num_query_epochs[0]]] = True
+        print(np.sum(idxs_lb_mask))
         self.dataset_dict = self.set_dataset(idxs_lb_mask)
         self.al.update(idxs_lb_mask)
         # Sequential loaders --> idxs are not changed
         # be careful when updating idxs_lb_mask, always has to be mapped back
         al_data_loaders = self.get_data_loader_for_al()
-
         # reset normal data loaders for semi-supervised training with original training routine
         self.loader_dict = self.set_data_loader()
         qs_counter = 1
+        print(range(self.start_epoch, self.epochs))
         for epoch in range(self.start_epoch, self.epochs):
             self.epoch = epoch
 
@@ -110,6 +114,7 @@ class FullySupervised(AlgorithmBase):
 
             for data_lb in self.loader_dict['train_lb']:
                 # prevent the training iterations exceed args.num_train_iter
+
                 if self.it > self.num_train_iter:
                     break
 

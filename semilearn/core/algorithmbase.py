@@ -96,7 +96,7 @@ class AlgorithmBase:
         self.ema = None
 
         # build dataset
-        self.dataset_dict, self.n_pool = self.set_dataset(get_size=True)
+        self.dataset_dict, self.n_pool = self.set_dataset(get_size=True, no_labels=True)
 
         # build data loader
         self.loader_dict = self.set_data_loader()
@@ -136,7 +136,7 @@ class AlgorithmBase:
         """
         raise NotImplementedError
 
-    def set_dataset(self, idxs_lb_mask=None, get_size=False):
+    def set_dataset(self, idxs_lb_mask=None, get_size=False, no_labels=False):
         """
         set dataset_dict
         """
@@ -150,7 +150,8 @@ class AlgorithmBase:
             self.args.num_classes,
             self.args.data_dir,
             self.args.include_lb_to_ulb,
-            idxs_lb_mask
+            idxs_lb_mask,
+	        no_labels=no_labels
         )
         if dataset_dict is None:
             return dataset_dict

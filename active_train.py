@@ -317,7 +317,6 @@ def main(args):
     # distributed: true if manually selected or if world_size > 1
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
     ngpus_per_node = torch.cuda.device_count()  # number of gpus of each node
-
     flow_logger = mlflow_logger.MLFlowLogger(experiment_name="SALOON_Test2")
     tracking_uri = flow_logger.get_tracking_uri()
     if args.multiprocessing_distributed:
@@ -392,14 +391,14 @@ def main_worker(gpu, ngpus_per_node, args, flow_logger, tracking_uri):
     run_name = str(args.save_name)
     print(save_path)
     run_id, output_path = flow_logger.init_experiment(run_name, hyper_parameters=cfg_dict, log_file=save_path, tracking_uri=tracking_uri)
-
     # SET Devices for (Distributed) DataParallel
     model.model = send_model_cuda(args, model.model)
     model.ema_model = send_model_cuda(args, model.ema_model, clip_batch=False)
     logger.info(f"Arguments: {model.args}")
-
     model.set_active_learner(active_learner)
 
+    if os.path.exists(args.load_path):
+        os.remove(args.load_path) # delete checkpoint
     # If args.resume, load checkpoints from args.load_path
     if args.resume and os.path.exists(args.load_path):
         try:
@@ -409,7 +408,6 @@ def main_worker(gpu, ngpus_per_node, args, flow_logger, tracking_uri):
             args.resume = False
     else:
         logger.info("Resume load path {} does not exist".format(args.load_path))
-
     if hasattr(model, "warmup"):
         logger.info(("Warmup stage"))
         model.warmup()

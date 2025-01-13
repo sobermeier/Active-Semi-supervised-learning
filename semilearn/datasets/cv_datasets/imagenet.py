@@ -11,37 +11,11 @@ from PIL import Image
 from torchvision import transforms
 import math
 from semilearn.datasets.augmentation import RandAugment, RandomResizedCropAndInterpolation, str_to_interp_mode
-from semilearn.datasets.cv_datasets.datasetbase import BasicDataset
-
+from semilearn.datasets.cv_datasets.datasetbase import BasicDataset, default_loader
 
 mean, std = {}, {}
 mean['imagenet'] = [0.485, 0.456, 0.406]
 std['imagenet'] = [0.229, 0.224, 0.225]
-
-
-def accimage_loader(path):
-    import accimage
-    try:
-        return accimage.Image(path)
-    except IOError:
-        # Potentially a decoding problem, fall back to PIL.Image
-        return pil_loader(path)
-
-
-def pil_loader(path):
-    # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
-    with open(path, 'rb') as f:
-        img = Image.open(f)
-        return img.convert('RGB')
-
-
-def default_loader(path):
-    from torchvision import get_image_backend
-    if get_image_backend() == 'accimage':
-        return accimage_loader(path)
-    else:
-        return pil_loader(path)
-
 
 def get_imagenet(args, alg, name, num_labels, num_classes, data_dir='./data', include_lb_to_ulb=True):
     img_size = args.img_size

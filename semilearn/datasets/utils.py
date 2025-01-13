@@ -16,7 +16,7 @@ base_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 def split_ssl_data(args, data, targets, num_classes,
 				   lb_num_labels, ulb_num_labels=None,
 				   lb_imbalance_ratio=1.0, ulb_imbalance_ratio=1.0,
-				   lb_index=None, ulb_index=None, include_lb_to_ulb=True, load_exist=True):
+				   lb_index=None, ulb_index=None, include_lb_to_ulb=True, load_exist=True, no_labels=False):
 	"""
 	data & target is splitted into labeled and unlabeled data.
 
@@ -40,7 +40,12 @@ def split_ssl_data(args, data, targets, num_classes,
 
 	data, targets = np.array(data), np.array(targets)
 	if lb_index is None:
-		lb_idx, ulb_idx = sample_labeled_unlabeled_data(args, data, targets, num_classes,
+		if no_labels:
+			lb_idx, ulb_idx = sample_labeled_unlabeled_data(args, data, targets, num_classes,
+														0, ulb_num_labels,
+														lb_imbalance_ratio, ulb_imbalance_ratio, load_exist=False)
+		else:
+			lb_idx, ulb_idx = sample_labeled_unlabeled_data(args, data, targets, num_classes,
 														lb_num_labels, ulb_num_labels,
 														lb_imbalance_ratio, ulb_imbalance_ratio, load_exist=False)
 
@@ -50,14 +55,18 @@ def split_ssl_data(args, data, targets, num_classes,
 		ulb_idx = ulb_index
 
 
-
-	if include_lb_to_ulb:
+	#print(ulb_idx)
+	if include_lb_to_ulb and not no_labels:
 		ulb_idx = np.concatenate([lb_idx, ulb_idx], axis=0)
 
 	print("lb_idx", len(lb_idx))
 	print("ulb_idx", len(ulb_idx))
+	#print(ulb_idx)
 
-	return data[lb_idx], targets[lb_idx], data[ulb_idx], targets[ulb_idx]
+	if no_labels:
+		return np.empty(0), np.empty(0), data[ulb_idx], targets[ulb_idx]
+	else:
+		return data[lb_idx], targets[lb_idx], data[ulb_idx], targets[ulb_idx]
 
 def sample_labeled_unlabeled_data(args, data, target, num_classes,
 								  lb_num_labels, ulb_num_labels=None,
